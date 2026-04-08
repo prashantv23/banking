@@ -1,0 +1,11 @@
+package com.bank.analyzer.application;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication(scanBasePackages = "com.bank.analyzer")
+public class AnalyzerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AnalyzerApplication.class, args);
+    }
+}

@@ -1,0 +1,81 @@
+project:
+  name: loan-system
+  type: distributed-loan-processing-system
+  language: java
+  build_tool: gradle
+
+applications:
+  - name: collector-app
+    role: customer data service and external dataset importer
+    port: 8081
+    responsibilities:
+      - fetch banking dataset metadata from GitHub API
+      - download and parse CSV data
+      - store banking records in H2
+      - derive and store customer records
+      - expose customer and import endpoints
+  - name: analyzer-app
+    role: loan eligibility processor
+    responsibilities:
+      - consume analysis requests from RabbitMQ
+      - fetch customer data from collector-app
+      - evaluate loan offers
+      - publish analysis results
+  - name: web-app
+    role: user-facing API
+    port: 8080
+    responsibilities:
+      - accept report requests
+      - publish analysis requests
+      - receive completed analysis results
+      - return loan reports to clients
+
+messaging:
+  broker: rabbitmq
+  exchange: loan.exchange
+  queues:
+    request: loan.analysis.request
+    result: loan.analysis.result
+
+database:
+  engine: h2
+  jdbc_url: jdbc:h2:file:./collector-app/data/collector_db;AUTO_SERVER=TRUE
+  migrations: collector-app/src/main/resources/db/migration
+  tables:
+    - customers
+    - banking_records
+
+external_data:
+  provider: github
+  dataset_repository: https://github.com/ahsan084/Banking-Dataset
+  metadata_endpoint: https://api.github.com/repos/ahsan084/Banking-Dataset/contents/Comprehensive_Banking_Database.csv
+
+structure:
+  applications:
+    - collector-app/src/main/java/com/bank/collector/application
+    - analyzer-app/src/main/java/com/bank/analyzer/application
+    - web-app/src/main/java/com/bank/web/application
+  controllers:
+    - collector-app/src/main/java/com/bank/collector/controller
+    - web-app/src/main/java/com/bank/web/controller
+  services:
+    - collector-app/src/main/java/com/bank/collector/service
+    - analyzer-app/src/main/java/com/bank/analyzer/service
+    - web-app/src/main/java/com/bank/web/service
+  support:
+    - collector-app/src/main/java/com/bank/collector/support
+    - analyzer-app/src/main/java/com/bank/analyzer/support
+    - web-app/src/main/java/com/bank/web/support
+  data:
+    - collector-app/src/main/java/com/bank/collector/model
+    - collector-app/src/main/java/com/bank/collector/repository
+    - collector-app/src/main/java/com/bank/collector/dto
+    - analyzer-app/src/main/java/com/bank/analyzer/dto
+    - web-app/src/main/java/com/bank/web/dto
+
+commands:
+  build: ./gradlew build
+  test: ./gradlew test
+  run_collector: ./gradlew :collector-app:bootRun
+  run_analyzer: ./gradlew :analyzer-app:bootRun
+  run_web: ./gradlew :web-app:bootRun

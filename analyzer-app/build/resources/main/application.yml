@@ -1,0 +1,12 @@
+server:
+  port: 8082
+
+collector:
+  base-url: http://localhost:8081/collector
+
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

@@ -1,0 +1,2 @@
+rootProject.name = 'loan-system'
+include 'web-app', 'analyzer-app', 'collector-app'

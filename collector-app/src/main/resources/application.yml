@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./collector-app/data/collector_db;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+banking:
+  dataset:
+    import-on-startup: true
+    metadata-url: https://api.github.com/repos/ahsan084/Banking-Dataset/contents/Comprehensive_Banking_Database.csv
